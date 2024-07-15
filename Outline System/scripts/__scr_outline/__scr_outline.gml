@@ -176,6 +176,7 @@ Outline System Error: Main shader could not be compiled on this hardware
 	                if (_surf != application_surface) {
 	                    if (surface_exists(_surf)) {
 	                        surface_free(_surf);
+							show_debug_message($"Surface {_surf} free from memory!")
 	                    }
 	                }
                 
@@ -567,7 +568,7 @@ function outline_draw_text_transformed(_x, _y, _string, _xscal, _yscal, _ang, _o
 /// @arg c4				= The colour for the bottom right of the drawn text.
 /// @arg alpha			= The alpha of the string.
 /// @arg [ol_config]	= The configuration struct for the outline. Use ol_config() to generate it.
-function outline_draw_text_color(_x, _y, _string, _c1, _c2 = _c1, _c3 = _c1, _c4 = _c1, _a, _ol_config = ol_config()) {
+function outline_draw_text_color(_x, _y, _string, _c1, _c2 = _c1, _c3 = _c1, _c4 = _c1, _a = 1, _ol_config = ol_config()) {
 	var _thick	= _ol_config.line_width
 		
 	var _halign = draw_get_halign();
@@ -667,7 +668,7 @@ function outline_draw_text_ext_transformed(_x, _y, _string, _sep, _w, _xscal, _y
 /// @arg c4				= The colour for the bottom right of the drawn text.
 /// @arg alpha			= The alpha of the string.
 /// @arg [ol_config]	= The configuration struct for the outline. Use ol_config() to generate it.
-function outline_draw_text_transformed_color(_x, _y, _string, _xscal, _yscal, _ang, _c1, _c2 = _c1, _c3 = _c1, _c4 = _c1, _a, _ol_config = ol_config()) {
+function outline_draw_text_transformed_color(_x, _y, _string, _xscal, _yscal, _ang, _c1, _c2 = _c1, _c3 = _c1, _c4 = _c1, _a = 1, _ol_config = ol_config()) {
 	var _thick	= _ol_config.line_width
 		
 	var _halign = draw_get_halign();
@@ -717,7 +718,7 @@ function outline_draw_text_transformed_color(_x, _y, _string, _xscal, _yscal, _a
 /// @arg c4				= The colour for the bottom right of the drawn text.
 /// @arg alpha			= The alpha of the string.
 /// @arg [ol_config]	= The configuration struct for the outline. Use ol_config() to generate it.
-function outline_draw_text_ext_color(_x, _y, _string, _sep, _w, _c1, _c2 = _c1, _c3 = _c1, _c4 = _c1, _a, _ol_config = ol_config()) {
+function outline_draw_text_ext_color(_x, _y, _string, _sep, _w, _c1, _c2 = _c1, _c3 = _c1, _c4 = _c1, _a = 1, _ol_config = ol_config()) {
 	var _thick	= _ol_config.line_width
 		
 	var _halign = draw_get_halign();
@@ -771,7 +772,7 @@ function outline_draw_text_ext_color(_x, _y, _string, _sep, _w, _c1, _c2 = _c1, 
 /// @arg c4				= The colour for the bottom right of the drawn text.
 /// @arg alpha			= The alpha of the string.
 /// @arg [ol_config]	= The configuration struct for the outline. Use ol_config() to generate it.
-function outline_draw_text_ext_transformed_color(_x, _y, _string, _sep, _w, _xscal, _yscal, _ang, _c1, _c2 = _c1, _c3 = _c1, _c4 = _c1, _a, _ol_config = ol_config()) {
+function outline_draw_text_ext_transformed_color(_x, _y, _string, _sep, _w, _xscal, _yscal, _ang, _c1, _c2 = _c1, _c3 = _c1, _c4 = _c1, _a = 1, _ol_config = ol_config()) {
 	var _thick	= _ol_config.line_width
 		
 	var _halign = draw_get_halign();

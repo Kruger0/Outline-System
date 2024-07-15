@@ -36,7 +36,8 @@
     {"id":{"name":"obj_player","path":"objects/obj_player/obj_player.yy",},},
     {"id":{"name":"obj_surf","path":"objects/obj_surf/obj_surf.yy",},},
     {"id":{"name":"obj_tree","path":"objects/obj_tree/obj_tree.yy",},},
-    {"id":{"name":"rm_demo","path":"rooms/rm_demo/rm_demo.yy",},},
+    {"id":{"name":"rm_demo_1","path":"rooms/rm_demo_1/rm_demo_1.yy",},},
+    {"id":{"name":"rm_demo_2","path":"rooms/rm_demo_2/rm_demo_2.yy",},},
     {"id":{"name":"__scr_outline","path":"scripts/__scr_outline/__scr_outline.yy",},},
     {"id":{"name":"__shd_outline","path":"shaders/__shd_outline/__shd_outline.yy",},},
     {"id":{"name":"spr_alpha","path":"sprites/spr_alpha/spr_alpha.yy",},},
@@ -51,7 +52,8 @@
   "resourceType":"GMProject",
   "resourceVersion":"2.0",
   "RoomOrderNodes":[
-    {"roomId":{"name":"rm_demo","path":"rooms/rm_demo/rm_demo.yy",},},
+    {"roomId":{"name":"rm_demo_1","path":"rooms/rm_demo_1/rm_demo_1.yy",},},
+    {"roomId":{"name":"rm_demo_2","path":"rooms/rm_demo_2/rm_demo_2.yy",},},
   ],
   "templateType":null,
   "TextureGroups":[

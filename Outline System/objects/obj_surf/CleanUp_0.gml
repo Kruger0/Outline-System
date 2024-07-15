@@ -1,3 +1,1 @@
-
-
 surface_free(surf)
