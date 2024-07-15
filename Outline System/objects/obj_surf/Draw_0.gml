@@ -15,17 +15,6 @@ surface_set_target(surf)
 surface_reset_target()
 outline_draw_surface(surf, 0, 0, ol_config(-12, c_black, , 1))
 
-// Text drawing pixel
-draw_set_font(fnt_1)
-	outline_draw_text_transformed_color(20, 20, "Quest: find the lumberjack.", 3, 3, 0, c_red, c_red, c_yellow, c_yellow, 1, ol_config(2, c_white, (dsin((current_time/5))+1)/2))
-
-	var _hour = string_replace_all(string_format(current_hour  , 2, 0), " ", "0")
-	var _minu = string_replace_all(string_format(current_minute, 2, 0), " ", "0")
-	var _seco = string_replace_all(string_format(current_second, 2, 0), " ", "0")
-	var _time = "Time: " + _hour + ":" + _minu + ":" + _seco
-
-	outline_draw_text_transformed_color(20, 70+(dsin(current_time/8)*10), _time, 3, 3, 0, c_white, c_white, c_white, c_white, 1, ol_config(2, c_black, 1, 0))
-
 // Text drawing HD
 draw_set_font(fnt_2)
 
@@ -40,7 +29,15 @@ draw_set_font(fnt_2)
 	draw_set_valign(0)
 	draw_set_halign(0)
 
+// Text drawing pixel
+draw_set_font(fnt_1)
+	outline_draw_text_transformed_color(20, 20, "Quest: find the lumberjack.", 3, 3, 0, c_red, c_red, c_yellow, c_yellow, 1, ol_config(2, c_white, (dsin((current_time/5))+1)/2))
+
+	var _hour = string_replace_all(string_format(current_hour  , 2, 0), " ", "0")
+	var _minu = string_replace_all(string_format(current_minute, 2, 0), " ", "0")
+	var _seco = string_replace_all(string_format(current_second, 2, 0), " ", "0")
+	var _time = "Time: " + _hour + ":" + _minu + ":" + _seco
+
+	outline_draw_text_transformed_color(20, 70+(dsin(current_time/8)*10), _time, 3, 3, 0, c_white, c_white, c_white, c_white, 1, ol_config(2, c_black, 1, 0))
+
 draw_set_font(-1)
-
-
-

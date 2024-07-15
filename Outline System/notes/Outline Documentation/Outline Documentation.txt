@@ -55,6 +55,9 @@ There are three types of outline function, each with its recommended use.
 	Note that this type does not automatically reset the shader, so
 	the outline_end(); function must be called after drawing the
 	targets.
+	
+	*IMPORTART!!* This method is outdated and internalized. The
+	outline_draw functions are recomended!
 						
 				
 >> outline_draw:

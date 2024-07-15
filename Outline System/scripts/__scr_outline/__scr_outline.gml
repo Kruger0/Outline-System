@@ -1,29 +1,55 @@
 
 
 //====================================================================
+#region CONFIGURATION
+
+//Default Settings  -  Change them if you want.
+
+#macro OUTLINE_LINE_WIDTH		1.0	
+#macro OUTLINE_LINE_COLOR		c_black
+#macro OUTLINE_LINE_ALPHA		1.0	
+#macro OUTLINE_TOLERANCE		0.0	
+#macro OUTLINE_RESOLUTION		1.0	
+#macro OUTLINE_ROUNDNESS		0.0	
+#macro OUTLINE_UV_BOUND_MODE	true
+
+#macro OUTLINE_CACHE_TEX_SIZE	1024
+
+#endregion
+//====================================================================
+
+
+//====================================================================
 #region SYSTEM START
 
 	/// @ignore
 	function __ol_cache() {
 		static data = {
-		
-			//Default Settings  -  Change them if you want.
+	
 			config: {
-				line_width		: 1.0,		// line_width
-				line_col		: #000000,	// line_col
-				line_alpha		: 1.0,		// line_alpha
-				tolerance		: 0.0,		// tolerance
-				resolution		: 1.0,		// resolution
-				roundness		: 0.0,		// roundness
-				uv_bound_mode	: true,		// uv_bound_mode
+				line_width		: OUTLINE_LINE_WIDTH,
+				line_col		: OUTLINE_LINE_COLOR,
+				line_alpha		: OUTLINE_LINE_ALPHA,
+				tolerance		: OUTLINE_TOLERANCE,
+				resolution		: OUTLINE_RESOLUTION,
+				roundness		: OUTLINE_ROUNDNESS,
+				uv_bound_mode	: OUTLINE_UV_BOUND_MODE,
 			},
 	
 			shader_supported	: false,
 			shader_compiled		: false,
 			support_traced		: false,
 			compile_traced		: false,
+			
+			uniforms	: {
+				line_color	: shader_get_uniform(__shd_outline, "u_line_color"),
+				pixel_size	: shader_get_uniform(__shd_outline, "u_pixel_size"),
+				thk_rn_tol	: shader_get_uniform(__shd_outline, "u_thk_rn_tol"),
+				uv			: shader_get_uniform(__shd_outline, "u_uv"),
+			},
 	
 			surface_mng: {
+				cache		: [],
 				structs		: [],
 				meta		: [],
 				test_index	: 0,
@@ -59,6 +85,8 @@ Outline System Error: Main shader could not be compiled on this hardware
 		show_debug_message(__ol_cache().tracer.not_supported)
 	__ol_cache().support_traced = true;
 	}
+	
+	//array_push(__ol_cache().surface_mng.cache, __outline_surface_create(2048, 2048))
 
 
 #endregion
@@ -69,19 +97,7 @@ Outline System Error: Main shader could not be compiled on this hardware
 #region INTERTAL
 
 	/// @ignore
-	function __outline_init() {	
-		if (is_undefined(self[$ "__outline_uniforms_initiated"])) {
-			__u_outline_line_color	= shader_get_uniform(__shd_outline, "u_line_color");
-			__u_outline_pixel_size	= shader_get_uniform(__shd_outline, "u_pixel_size");
-			__u_outline_thk_rn_tol	= shader_get_uniform(__shd_outline, "u_thk_rn_tol")
-			__u_outline_uv			= shader_get_uniform(__shd_outline, "u_uv");
-				
-			self[$ "__outline_uniforms_initiated"] = true;
-		};
-	};
-
-	/// @ignore
-	function __outline_start() {
+	function __outline_set_shader() {
 		if (__ol_cache().shader_compiled) {
 			if (shader_current() != __shd_outline) {
 				shader_set(__shd_outline)
@@ -97,21 +113,20 @@ Outline System Error: Main shader could not be compiled on this hardware
 
 	/// @ignore
 	function __outline_set_uniforms(_texture, _uv, _thick, _col, _alpha, _tol, _res, _round, _uv_bnd) {
+		static uniforms = __ol_cache().uniforms
+		var _w			= texture_get_texel_width(_texture);
+		var _h			= texture_get_texel_height(_texture);
 	
-		var _w = texture_get_texel_width(_texture);
-		var _h = texture_get_texel_height(_texture);
-	
-		var _color = [
-			((_col) & 0xFF)			/ 255,
-	        ((_col >> 8) & 0xFF)	/ 255,
-	        ((_col >> 16) & 0xFF)	/ 255,
-			_alpha,
-		];
-	
-		shader_set_uniform_f_array(__u_outline_line_color, _color);
-		shader_set_uniform_f_array(__u_outline_pixel_size, [_w*(1.0/_res), _h*(1.0/_res)]);
-		shader_set_uniform_f(__u_outline_thk_rn_tol, _thick*_res, _round, _tol)
-		shader_set_uniform_f(__u_outline_uv, _uv[0], _uv[1], _uv[2], _uv[3]);
+		shader_set_uniform_f(uniforms.line_color, 
+			((_col)		  & 0xFF) / 255.0,
+			((_col >> 8)  & 0xFF) / 255.0,
+			((_col >> 16) & 0xFF) / 255.0,
+			_alpha
+		);
+		
+		shader_set_uniform_f(uniforms.pixel_size, _w*(1.0/_res), _h*(1.0/_res));
+		shader_set_uniform_f(uniforms.thk_rn_tol, _thick*_res, _round, _tol)
+		shader_set_uniform_f(uniforms.uv, _uv[0], _uv[1], _uv[2], _uv[3]);
 	};
 
 	/// @ignore
@@ -123,26 +138,26 @@ Outline System Error: Main shader could not be compiled on this hardware
     
 	    var _meta = {surf: _surf};
 	    array_push(__ol_cache().surface_mng.meta, _meta);
-    
+				
 	    return _struct;
 	}
 
 	/// @ignore
 	function __outline_surface_get(_wid, _hei) {
-		_ol_surf_array = self[$ "_ol_surf_array"] ?? [];
-	
-		var _index = 0
-		var _surf = -1
-		var _my_surf = -1
-		var _surf_found = false
+		var _mng		= __ol_cache().surface_mng;
+		var _array		= _mng.cache;
+		var _index		= 0;
+		var _surf		= -1;
+		var _my_surf	= -1;
+		var _surf_found = false;
 
-		for (var i = 0, _len = array_length(_ol_surf_array); i < _len; i++) {
-			_index = _ol_surf_array[i]
+		for (var i = 0, _len = array_length(_array); i < _len; i++) {
+			_index = _array[i]
 			if (is_struct(_index)) {
 				_surf = _index.surf
 				if (surface_exists(_surf)) {
 					if (surface_get_width(_surf) >= _wid && surface_get_height(_surf) >= _hei) {
-						_my_surf = _index
+						_my_surf	= _index
 						_surf_found = true
 					}
 				}
@@ -150,24 +165,25 @@ Outline System Error: Main shader could not be compiled on this hardware
 		}
 	
 		if !(_surf_found) {
-			_my_surf = __outline_surface_create(_wid, _hei)
-			array_push(_ol_surf_array, _my_surf)
+			_my_surf = __outline_surface_create(max(_wid, OUTLINE_CACHE_TEX_SIZE), max(_hei, OUTLINE_CACHE_TEX_SIZE))
+			array_push(_array, _my_surf)
 		}
 	
 		return _my_surf.surf;
 	}
-
+	
 	/// @ignore
 	function __outline_gc() {
 	
 		// Method originaly created by JujuAdams
+		// After the global cache this is kind of unnecessary but anyways...
 		var _mng = __ol_cache().surface_mng;
 	    var _size = array_length(_mng.structs);
 	
 	    if (_size > 0) {
 		
 	        var i = _mng.test_index;
-	        repeat(min(10, _size)) { // Max iterarions per step
+	        repeat(min(4, _size)) { // Max iterarions per step
 	            if (weak_ref_alive(_mng.structs[i])) {
 	                i = (i + 1) mod _size;
 	            } else {
@@ -195,7 +211,7 @@ Outline System Error: Main shader could not be compiled on this hardware
 	    }
 	}
 
-	var _ts = time_source_create(time_source_global, 1, time_source_units_frames, __outline_gc, [], -1)
+	var _ts = time_source_create(time_source_global, 60, time_source_units_frames, __outline_gc, [], -1)
 	time_source_start(_ts)
 
 #endregion
@@ -208,7 +224,9 @@ Outline System Error: Main shader could not be compiled on this hardware
 
 /// @desc	Reset the default shader.
 function outline_end() {
-	shader_reset();
+	if (shader_current() == __shd_outline) {
+		shader_reset();
+	}
 };
 
 
@@ -221,15 +239,36 @@ function outline_end() {
 /// @arg [resolution]	= The resolution of the outline.
 /// @arg [uv_bound]		= Locks the shader on the sprite uv.
 function ol_config(_width, _col, _alpha, _round, _tol, _res, _uv_bnd) {
-	
+	static config =  __ol_cache().config
 	return {
-		line_width		: _width	?? __ol_cache().config.line_width,
-		line_col		: _col		?? __ol_cache().config.line_col,
-		line_alpha		: _alpha	?? __ol_cache().config.line_alpha,
-		roundness		: _round	?? __ol_cache().config.roundness,
-		tolerance		: _tol		?? __ol_cache().config.tolerance,
-		resolution		: _res		?? __ol_cache().config.resolution,
-		uv_bound_mode	: _uv_bnd	?? __ol_cache().config.uv_bound_mode,
+		line_width		: _width	?? config.line_width,	
+		line_col		: _col		?? config.line_col,
+		line_alpha		: _alpha	?? config.line_alpha,
+		roundness		: _round	?? config.roundness,
+		tolerance		: _tol		?? config.tolerance,
+		resolution		: _res		?? config.resolution,
+		uv_bound_mode	: _uv_bnd	?? config.uv_bound_mode,
+	}
+}
+
+
+/// @desc	Set a default configuration struct for the outline.
+/// @arg [line_width]	= The thickness, in pixels, of the outline.
+/// @arg [line_col]		= The color of the outline.
+/// @arg [line_alpha]	= The alpha of the outline.
+/// @arg [roundness]	= The roundess factor of the outline.
+/// @arg [tolerance]	= The minimum alpha value a pixel need to become an outline.
+/// @arg [resolution]	= The resolution of the outline.
+/// @arg [uv_bound]		= Locks the shader on the sprite uv.
+function outline_set_config(_width, _col, _alpha, _round, _tol, _res, _uv_bnd) {
+	with (__ol_cache().config) {
+		line_width		= _width	?? line_width	
+		line_col		= _col		?? line_col	
+		line_alpha		= _alpha	?? line_alpha	
+		roundness		= _round	?? roundness	
+		tolerance		= _tol		?? tolerance	
+		resolution		= _res		?? resolution	
+		uv_bound_mode	= _uv_bnd	?? uv_bound_mode
 	}
 }
 
@@ -245,20 +284,21 @@ function ol_config(_width, _col, _alpha, _round, _tol, _res, _uv_bnd) {
 /// @desc	Set the outline shader for the next draw texts.
 /// @arg [ol_config]	= The configuration struct for the outline. Use ol_config() to generate it.
 function outline_set_text(_ol_config = ol_config()) {
-	var _thick	= _ol_config.line_width
-	var _col	= _ol_config.line_col
-	var _alpha	= _ol_config.line_alpha
-	var _round	= _ol_config.roundness
-	var _tol	= _ol_config.tolerance
-	var _res	= _ol_config.resolution
-	var _uv_bnd = _ol_config.uv_bound_mode
+	static uv_default = [0.0, 0.0, 1.0, 1.0];
+	
+	var _thick	= _ol_config.line_width;
+	var _col	= _ol_config.line_col;
+	var _alpha	= _ol_config.line_alpha;
+	var _round	= _ol_config.roundness;
+	var _tol	= _ol_config.tolerance;
+	var _res	= _ol_config.resolution;
+	var _uv_bnd = _ol_config.uv_bound_mode;
 		
-	__outline_init();
-	__outline_start();
 	var _font = draw_get_font();
 	var _texture = font_get_texture(_font);
-
-	var _uv = _uv_bnd ? font_get_uvs(_font) : [0.0, 0.0, 1.0, 1.0];
+	var _uv = _uv_bnd ? font_get_uvs(_font) : uv_default;
+	
+	__outline_set_shader();
 	__outline_set_uniforms(_texture, _uv, _thick, _col, _alpha, _tol, _res, _round, _uv);
 }
 
@@ -824,6 +864,8 @@ function outline_draw_text_ext_transformed_color(_x, _y, _string, _sep, _w, _xsc
 /// @arg subimg			= The subimg of the sprite to be used.
 /// @arg [ol_config]	= The configuration struct for the outline. Use ol_config() to generate it.
 function outline_set_sprite(_spr, _subimg, _ol_config = ol_config()) {
+	static uv_default = [0.0, 0.0, 1.0, 1.0];
+	
 	var _thick	= _ol_config.line_width
 	var _col	= _ol_config.line_col
 	var _alpha	= _ol_config.line_alpha
@@ -832,11 +874,12 @@ function outline_set_sprite(_spr, _subimg, _ol_config = ol_config()) {
 	var _res	= _ol_config.resolution
 	var _uv_bnd = _ol_config.uv_bound_mode
 		
-	__outline_init();
-	__outline_start();
 	var _texture = sprite_get_texture(_spr, _subimg);
-	var _uv = _uv_bnd ? sprite_get_uvs(_spr, _subimg) : [0.0, 0.0, 1.0, 1.0];
+	var _uv = _uv_bnd ? sprite_get_uvs(_spr, _subimg) : uv_default;
+	
+	__outline_set_shader();
 	__outline_set_uniforms(_texture, _uv, _thick, _col, _alpha, _tol, _res, _round, _uv);
+	
 	return _spr;
 }
 
@@ -943,19 +986,22 @@ function outline_draw_sprite_ext(_spr, _subimg, _x, _y, _xscal, _yscal, _rot, _s
 /// @arg surface_id		= The surface to be drawned.
 /// @arg [ol_config]	= The configuration struct for the outline. Use ol_config() to generate it.
 function outline_set_surface(_surf, _ol_config = ol_config()) {
-	var _thick	= _ol_config.line_width
-	var _col	= _ol_config.line_col
-	var _alpha	= _ol_config.line_alpha
-	var _round	= _ol_config.roundness
-	var _tol	= _ol_config.tolerance
-	var _res	= _ol_config.resolution
-	var _uv_bnd = _ol_config.uv_bound_mode
+	static uv_default = [0.0, 0.0, 1.0, 1.0];
+	
+	var _thick	= _ol_config.line_width;
+	var _col	= _ol_config.line_col;
+	var _alpha	= _ol_config.line_alpha;
+	var _round	= _ol_config.roundness;
+	var _tol	= _ol_config.tolerance;
+	var _res	= _ol_config.resolution;
+	var _uv_bnd = _ol_config.uv_bound_mode;
 		
-	__outline_init();
-	__outline_start();
 	var _texture = surface_get_texture(_surf);
-	var _uv = _uv_bnd ? texture_get_uvs(_texture) : [0.0, 0.0, 1.0, 1.0];
+	var _uv = _uv_bnd ? texture_get_uvs(_texture) : uv_default;
+	
+	__outline_set_shader();
 	__outline_set_uniforms(_texture, _uv, _thick, _col, _alpha, _tol, _res, _round, _uv);
+	
 	return _surf;
 }
 
