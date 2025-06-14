@@ -31,7 +31,7 @@ function outline_set_sprite(_sprite, _subimg, _ol_config = ol_config()) {
 /// @arg y              The Y coordinate of the sprite.
 /// @arg [ol_config]    The configuration struct for the outline. Use ol_config() to generate it.
 function outline_draw_sprite(_sprite, _subimg, _x, _y, _ol_config = ol_config()) {
-    outline_draw_sprite_ext(_sprite, _subimg, _x, _y, 1, 1, 0, c_white, draw_get_alpha(), _ol_config);
+    outline_draw_sprite_ext(_sprite, _subimg, _x, _y, 1, 1, 0, draw_get_color(), draw_get_alpha(), _ol_config);
 }
 
 
