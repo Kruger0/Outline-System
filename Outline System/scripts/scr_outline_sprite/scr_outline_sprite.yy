@@ -1,9 +1,9 @@
 {
   "$GMScript":"v1",
-  "%Name":"__scr_outline",
+  "%Name":"scr_outline_sprite",
   "isCompatibility":false,
   "isDnD":false,
-  "name":"__scr_outline",
+  "name":"scr_outline_sprite",
   "parent":{
     "name":"Outline System",
     "path":"folders/Outline System.yy",
