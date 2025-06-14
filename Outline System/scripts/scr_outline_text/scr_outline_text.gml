@@ -28,7 +28,8 @@ function outline_set_text(_ol_config = ol_config()) {
 /// @arg string         The string to be drawed.
 /// @arg [ol_config]    The configuration struct for the outline. Use ol_config() to generate it.
 function outline_draw_text(_x, _y, _string, _ol_config = ol_config()) {
-    outline_draw_text_ext_transformed_color(_x, _y, _string, string_height("I"), -1, 1, 1, 0, c_white, c_white, c_white, c_white, draw_get_alpha(), _ol_config);
+    var _col = draw_get_color();
+    outline_draw_text_ext_transformed_color(_x, _y, _string, string_height("I"), -1, 1, 1, 0, _col, _col, _col, _col, draw_get_alpha(), _ol_config);
 }
 
 
@@ -40,20 +41,8 @@ function outline_draw_text(_x, _y, _string, _ol_config = ol_config()) {
 /// @arg w              The maximum withd in pixels of the string before a line break.
 /// @arg [ol_config]    The configuration struct for the outline. Use ol_config() to generate it.
 function outline_draw_text_ext(_x, _y, _string, _sep, _w, _ol_config = ol_config()) {
-    outline_draw_text_ext_transformed_color(_x, _y, _string, _sep, _w, 1, 1, 0, c_white, c_white, c_white, c_white, draw_get_alpha(), _ol_config);
-}
-
-
-/// @desc               Draw an outlined text with transformations.
-/// @arg x              The X coordinate of the text.
-/// @arg y              The Y coordinate of the text.
-/// @arg string         The string to be drawed.
-/// @arg xscale         The horizontal scale of the string.
-/// @arg yscale         The vertical scale of the string.
-/// @arg angle          The angle of the string.
-/// @arg [ol_config]    The configuration struct for the outline. Use ol_config() to generate it.
-function outline_draw_text_transformed(_x, _y, _string, _xscale, _yscale, _ang, _ol_config = ol_config()) {
-    outline_draw_text_ext_transformed_color(_x, _y, _string, string_height("I"), -1, _xscale, _yscale, _ang, c_white, c_white, c_white, c_white, draw_get_alpha(), _ol_config);
+    var _col = draw_get_color();
+    outline_draw_text_ext_transformed_color(_x, _y, _string, _sep, _w, 1, 1, 0, _col, _col, _col, _col, draw_get_alpha(), _ol_config);
 }
 
 
@@ -72,7 +61,38 @@ function outline_draw_text_color(_x, _y, _string, _c1, _c2 = _c1, _c3 = _c1, _c4
 }
 
 
-/// @desc               Draw an outlined text with extra formating.
+/// @desc               Draw an outlined text with transformations.
+/// @arg x              The X coordinate of the text.
+/// @arg y              The Y coordinate of the text.
+/// @arg string         The string to be drawed.
+/// @arg xscale         The horizontal scale of the string.
+/// @arg yscale         The vertical scale of the string.
+/// @arg angle          The angle of the string.
+/// @arg [ol_config]    The configuration struct for the outline. Use ol_config() to generate it.
+function outline_draw_text_transformed(_x, _y, _string, _xscale, _yscale, _ang, _ol_config = ol_config()) {
+    var _col = draw_get_color();
+    outline_draw_text_ext_transformed_color(_x, _y, _string, string_height("I"), -1, _xscale, _yscale, _ang, _col, _col, _col, _col, draw_get_alpha(), _ol_config);
+}
+
+
+/// @desc               Draw an outlined text with extra formating and color.
+/// @arg x              The X coordinate of the text.
+/// @arg y              The Y coordinate of the text.
+/// @arg string         The string to be drawed.
+/// @arg sep            The distance in pixels between lines of text.
+/// @arg w              The maximum withd in pixels of the string before a line break.
+/// @arg c1             The colour for the top left of the drawn text.
+/// @arg c2             The colour for the top right of the drawn text.
+/// @arg c3             The colour for the bottom left of the drawn text.
+/// @arg c4             The colour for the bottom right of the drawn text.
+/// @arg alpha          The alpha of the string.
+/// @arg [ol_config]    The configuration struct for the outline. Use ol_config() to generate it.
+function outline_draw_text_ext_color(_x, _y, _string, _sep, _w, _c1, _c2 = _c1, _c3 = _c1, _c4 = _c1, _a = 1, _ol_config = ol_config()) {
+    outline_draw_text_ext_transformed_color(_x, _y, _string, _sep, _w, 1, 1, 0, _c1, _c2, _c3, _c4, _a, _ol_config);
+}
+
+
+/// @desc               Draw an outlined text with extra formating and transformations.
 /// @arg x              The X coordinate of the text.
 /// @arg y              The Y coordinate of the text.
 /// @arg string         The string to be drawed.
@@ -83,7 +103,8 @@ function outline_draw_text_color(_x, _y, _string, _c1, _c2 = _c1, _c3 = _c1, _c4
 /// @arg angle          The angle of the string.
 /// @arg [ol_config]    The configuration struct for the outline. Use ol_config() to generate it.
 function outline_draw_text_ext_transformed(_x, _y, _string, _sep, _w, _xscale, _yscale, _ang, _ol_config = ol_config()) {
-    outline_draw_text_ext_transformed_color(_x, _y, _string, _sep, _w, _xscale, _yscale, _ang, c_white, c_white, c_white, c_white, draw_get_alpha(), _ol_config);
+    var _col = draw_get_color();
+    outline_draw_text_ext_transformed_color(_x, _y, _string, _sep, _w, _xscale, _yscale, _ang, _col, _col, _col, _col, draw_get_alpha(), _ol_config);
 }
 
 
@@ -105,24 +126,7 @@ function outline_draw_text_transformed_color(_x, _y, _string, _xscale, _yscale, 
 }
 
 
-/// @desc               Draw an outlined text with extra formating.
-/// @arg x              The X coordinate of the text.
-/// @arg y              The Y coordinate of the text.
-/// @arg string         The string to be drawed.
-/// @arg sep            The distance in pixels between lines of text.
-/// @arg w              The maximum withd in pixels of the string before a line break.
-/// @arg c1             The colour for the top left of the drawn text.
-/// @arg c2             The colour for the top right of the drawn text.
-/// @arg c3             The colour for the bottom left of the drawn text.
-/// @arg c4             The colour for the bottom right of the drawn text.
-/// @arg alpha          The alpha of the string.
-/// @arg [ol_config]    The configuration struct for the outline. Use ol_config() to generate it.
-function outline_draw_text_ext_color(_x, _y, _string, _sep, _w, _c1, _c2 = _c1, _c3 = _c1, _c4 = _c1, _a = 1, _ol_config = ol_config()) {
-    outline_draw_text_ext_transformed_color(_x, _y, _string, _sep, _w, 1, 1, 0, _c1, _c2, _c3, _c4, _a, _ol_config);
-}
-
-
-/// @desc               Draw an outlined text with extra formating.
+/// @desc               Draw an outlined text with extra formating, transformations a color.
 /// @arg x              The X coordinate of the text.
 /// @arg y              The Y coordinate of the text.
 /// @arg string         The string to be drawed.

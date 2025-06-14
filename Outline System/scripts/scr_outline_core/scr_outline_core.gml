@@ -12,7 +12,7 @@
 #macro OUTLINE_RESOLUTION       1.0
 #macro OUTLINE_ROUNDNESS        0.0
 #macro OUTLINE_UV_BOUND_MODE    true
-#macro OUTLINE_CACHE_TEX_SIZE   16
+#macro OUTLINE_CACHE_TEX_SIZE   64
 
 #endregion
 //====================================================================
@@ -230,7 +230,7 @@ function outline_end() {
 function ol_config(_width, _col, _alpha, _round, _tol, _res, _uv_bnd) {
     static config =  __ol_cache().config
     return {
-        line_width      : _width    ?? config.line_width,    
+        line_width      : _width    ?? config.line_width,
         line_col        : _col      ?? config.line_col,
         line_alpha      : _alpha    ?? config.line_alpha,
         roundness       : _round    ?? config.roundness,
